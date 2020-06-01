@@ -1,0 +1,2 @@
+rootProject.name='superHeroSquadMaker'
+include ':app'

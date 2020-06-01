@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/HeroList">
+
+    <fragment
+        android:id="@+id/HeroList"
+        android:name="com.example.superherosquadmaker.ui.list.HeroList"
+        android:label="@string/first_fragment_label"
+        tools:layout="@layout/fragment_hero_list">
+
+        <action
+            android:id="@+id/action_HeroList_to_HeroDetails"
+            app:destination="@id/HeroDetails">
+            <argument
+                android:name="Hero"
+                app:argType="com.example.superherosquadmaker.data.localdb.Hero" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/HeroDetails"
+        android:name="com.example.superherosquadmaker.ui.heroDetails.HeroDetails"
+        android:label="@string/second_fragment_label"
+        tools:layout="@layout/fragment_hero_details">
+        <action
+            android:id="@+id/action_HeroDetails_to_HeroList"
+            app:destination="@id/HeroList"
+            app:popUpTo="@id/HeroList" />
+    </fragment>
+</navigation>

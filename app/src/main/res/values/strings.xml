@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Superhero Squad Maker</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="superhero_image_desc">super hero image</string>
+    <string name="go_back_img_content_description">go back img</string>
+    <string name="super_hero_image_description">super hero image description</string>
+    <string name="last_appeared_in">Last appeared in</string>
+    <string name="no_comics">No comics for this character were provided</string>
+    <string name="add_him_in_your_squad">💪 Hire to Squad</string>
+    <string name="my_squad">My Squad</string>
+    <string name="fire_from_squad">🔥 Fire from Squad</string>
+    <string name="alert_title">Important!</string>
+    <string name="alert_message">Are you sure you want to fire the Superhero from your Squad?</string>
+    <string name="no_description">No description for this character</string>
+</resources>

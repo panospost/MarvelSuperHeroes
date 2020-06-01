@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="clickListener"
+            type="com.example.superherosquadmaker.ui.list.ItemClickedListener"/>
+        <variable name="user"
+            type="com.example.superherosquadmaker.data.localdb.Hero"/>
+
+    </data>
+
+
+    <LinearLayout
+        android:onClick="@{()-> clickListener.onClick(user)}"
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:id="@+id/heroImg"
+            android:layout_width="80dp"
+            android:layout_height="64dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@string/superhero_image_desc"
+            app:srcCompat="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/displayName"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@{user.name}"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:singleLine="false"
+            style="@style/listTextView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/heroImg"
+            tools:text="Display Name" />
+
+
+    </LinearLayout>
+
+</layout>
