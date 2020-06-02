@@ -28,8 +28,6 @@ class LinearHeroAdapter(private val onClickListener: ItemClickedListener): ListA
         fun bind(user: Hero, listener: ItemClickedListener){
             binding.user = user
             binding.clickListener = listener
-            Picasso.get().load(user.thumbnail).transform(RoundCornersTransform()).fit().centerCrop().into(binding.heroImg)
-            binding.executePendingBindings()
         }
     }
 }

@@ -29,6 +29,11 @@ fun ImageView.loadFromPicasso(url: String?) {
         .centerCrop().into(this)
 }
 
+@BindingAdapter("roundFromPicasso")
+fun ImageView.roundFromPicasso(url: String?) {
+    Picasso.get().load(url).transform(RoundCornersTransform()).fit().centerCrop().into(this)
+}
+
 @BindingAdapter("nullOrEmptyDescription")
 fun TextView.nullOrEmptyDescription(description: String) {
     if(description == "") {

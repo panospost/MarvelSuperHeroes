@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.superherosquadmaker.data.localdb.ComicLocal
 import com.example.superherosquadmaker.data.localdb.Hero
-import com.example.superherosquadmaker.data.model.heroesCollection.HeroesData
 import com.example.superherosquadmaker.utils.fromHeroToSuperHero
 import com.example.superherosquadmaker.utils.Resource
 import com.example.superherosquadmaker.utils.fromMarvelComicToLocalComic
@@ -21,6 +20,8 @@ class HeroListViewModel(
     val marverRepository: MarverRepository,
     private val localRepository: LocalDbRepository
 ) : ViewModel() {
+    private val REQUESTED_CHARACTERS = 20
+    private var offset = 0
 
     private val _heroes = MutableLiveData<Resource<List<Hero>>>()
     val heroes: LiveData<Resource<List<Hero>>> = _heroes
@@ -31,22 +32,19 @@ class HeroListViewModel(
     private val _comics = MutableLiveData<Resource<List<ComicLocal>>>()
     val comics: LiveData<Resource<List<ComicLocal>>> = _comics
 
-    private val _heroesCount = MutableLiveData<Int>()
-    val heroesCount: LiveData<Int> = _heroesCount
-
-    private val _heroesOffset = MutableLiveData<Int>()
-    val heroesOffset: LiveData<Int> = _heroesOffset
+    private val _loadingMore = MutableLiveData<Resource<Boolean>>()
+    val loadingMore: LiveData<Resource<Boolean>> = _loadingMore
 
     init {
         getMySquad()
     }
 
-     fun getMySquad() {
+    fun getMySquad() {
         viewModelScope.launch {
             localRepository.getMySquad()
                 .flowOn(Dispatchers.IO)
                 .catch { e ->
-                    _mySquad.postValue(Resource.error(e.toString(), null))
+                    _mySquad.postValue(Resource.error(e.message.toString(), null))
                 }
                 .collect {
                     _mySquad.postValue(Resource.success(it))
@@ -54,13 +52,14 @@ class HeroListViewModel(
         }
     }
 
+    @ExperimentalCoroutinesApi
     fun updateCharacter(hero: Hero) {
-        viewModelScope.launch{
+        viewModelScope.launch {
             localRepository.removeOrAddToMySquad(hero)
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
-                   _heroes.postValue(Resource.error(e.toString(), null))
-               }.collect{
+                    _heroes.postValue(Resource.error(e.toString(), null))
+                }.collect {
                     getMySquad()
                     _heroes.postValue(Resource.success(listOf(hero)))
                 }
@@ -74,9 +73,12 @@ class HeroListViewModel(
                 .flatMapConcat { usersStored ->
                     if (usersStored.isEmpty()) {
                         return@flatMapConcat marverRepository.getAllHeroes(
-                            20
+                            REQUESTED_CHARACTERS
                         ).map { heroesData ->
-                            normalizeHeroResults(heroesData!!)
+                            if (heroesData != null) {
+                                offset = REQUESTED_CHARACTERS
+                            }
+                            heroesData?.results?.map { it.fromHeroToSuperHero() }?.toList()
                         }.flatMapConcat { heroes ->
                             localRepository.insertAll(heroes!!).flatMapConcat {
                                 flow {
@@ -86,16 +88,47 @@ class HeroListViewModel(
                         }
                     } else {
                         return@flatMapConcat flow {
+                            offset = usersStored.size
                             emit(usersStored)
                         }
                     }
                 }
                 .flowOn(Dispatchers.Default)
                 .catch { e ->
-                    _heroes.postValue(Resource.error(e.toString(), null))
+                    _heroes.postValue(Resource.error(e.message.toString(), null))
                 }
                 .collect {
                     _heroes.postValue(Resource.success(it))
+                }
+        }
+    }
+
+    @ExperimentalCoroutinesApi
+    fun getMoreHeroes() {
+        viewModelScope.launch {
+            _loadingMore.postValue(Resource.loading(true))
+            marverRepository.getMoreHeroes(
+                REQUESTED_CHARACTERS,
+                offset
+            ).map{ heroesData ->
+                offset += REQUESTED_CHARACTERS
+                heroesData?.results?.map { it.fromHeroToSuperHero() }?.toList()
+
+            }.flatMapConcat { newHeroes->
+               return@flatMapConcat  localRepository.insertAll(newHeroes!!).flatMapConcat {
+                        flow {
+                            emit(heroes)
+                        }
+                    }
+            }.flowOn(Dispatchers.Default)
+                .catch { e ->
+                    _loadingMore.postValue(Resource.error(e.message.toString(), null))
+                }
+                .onCompletion {
+                    _loadingMore.postValue(Resource.loading(false))
+                }
+                .collect {
+                    _loadingMore.postValue(Resource.loading(false))
                 }
         }
     }
@@ -110,38 +143,29 @@ class HeroListViewModel(
                     if (storedComics.isEmpty()) {
                         return@flatMapConcat marverRepository.getAllComics(
                             characterId
-                        ).map{comicsData ->
-                            comicsData!!.results?.map { it.fromMarvelComicToLocalComic(characterId) }?.toList()
+                        ).map { comicsData ->
+                            comicsData!!.results?.map { it.fromMarvelComicToLocalComic(characterId) }
+                                ?.toList()
                         }.flatMapConcat { comics ->
                             Log.i("comics", comics?.size.toString())
-                                localRepository.insertAllComics(comics!!).flatMapConcat {
-                                    flow {
-                                        emit(comics)
-                                    }
+                            localRepository.insertAllComics(comics!!).flatMapConcat {
+                                flow {
+                                    emit(comics)
                                 }
+                            }
                         }
                     } else {
                         return@flatMapConcat flow {
                             emit { storedComics }
                         }
                     }
-                    }.flowOn(Dispatchers.Default)
-                     .catch { e ->
-                            _comics.postValue(Resource.error(e.toString(), null))
-                     }.collect {
-                            _comics.postValue(Resource.success(it) as Resource<List<ComicLocal>>?)
-                     }
+                }.flowOn(Dispatchers.Default)
+                .catch { e ->
+                    _comics.postValue(Resource.error(e.message.toString(), null))
+                }.collect {
+                    _comics.postValue(Resource.success(it) as Resource<List<ComicLocal>>?)
+                }
         }
     }
-
-    private fun normalizeHeroResults(data: HeroesData): List<Hero>? {
-        _heroesCount.postValue(
-            data.count
-        )
-        _heroesOffset.postValue(
-            data.offset
-        )
-        return data.results?.map { it.fromHeroToSuperHero() }?.toList()
-    }
-
 }
+

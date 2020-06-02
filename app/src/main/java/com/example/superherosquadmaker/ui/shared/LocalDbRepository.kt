@@ -1,10 +1,8 @@
 package com.example.superherosquadmaker.ui.shared
 
-import android.util.Log
 import com.example.superherosquadmaker.data.localdb.ComicLocal
 import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.data.localdb.HerosLocalDb
-import com.example.superherosquadmaker.utils.SquadMember
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

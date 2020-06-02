@@ -16,6 +16,16 @@ interface APIInterface {
         @Query("hash") hash: String
     ): GetHeroesResponse
 
+    @GET("/v1/public/characters")
+    suspend fun getMoreHeroes(
+        @Query("orderBy") orderBy: String,
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("ts") timestamp: String,
+        @Query("apikey") apikey: String,
+        @Query("hash") hash: String
+    ): GetHeroesResponse
+
     @GET("/v1/public/characters/{characterId}/comics")
     suspend fun getAllComicsOfThatHero(
         @Path("characterId") characterId: Int,

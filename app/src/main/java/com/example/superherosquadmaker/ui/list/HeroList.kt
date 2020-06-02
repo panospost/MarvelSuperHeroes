@@ -1,17 +1,17 @@
 package com.example.superherosquadmaker.ui.list
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.superherosquadmaker.R
 import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.data.localdb.HerosLocalDb
@@ -22,6 +22,7 @@ import com.example.superherosquadmaker.ui.shared.LocalDbRepository
 import com.example.superherosquadmaker.ui.shared.MarverRepository
 import com.example.superherosquadmaker.utils.Status
 import com.example.superherosquadmaker.utils.setDivider
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -70,11 +71,24 @@ class HeroList : Fragment() {
         ).get(HeroListViewModel::class.java)
     }
 
+    @ExperimentalCoroutinesApi
     private fun setUpUI() {
         binding.viewModel = heroListViewModel
         adapter = LinearHeroAdapter(ItemClickedListener { item -> handleItemClick(item) })
         binding.listView.adapter = adapter
-        binding.listView.setDivider(R.drawable.recycler_view_divider)
+        binding.run {
+            listView.setDivider(R.drawable.recycler_view_divider)
+            listView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (!recyclerView.canScrollVertically(1)) {
+                        heroListViewModel.getMoreHeroes()
+                    }
+                }
+
+            })
+        }
 
         horizontalAdapter = HorizontalHeroListAdapter(ItemClickedListener { item -> handleItemClick(item) })
         binding.mySquad.adapter = horizontalAdapter
@@ -87,7 +101,8 @@ class HeroList : Fragment() {
             when(it.status) {
                 Status.SUCCESS -> {
                     binding.loading.visibility = View.GONE
-                    adapter.submitList(it.data)
+                    adapter.submitList(it.data?.toMutableList())
+                    Log.d("newdata", it.data?.size.toString())
                 }
                 Status.ERROR -> {
                     binding.loading.visibility = View.GONE
@@ -116,6 +131,40 @@ class HeroList : Fragment() {
                 Status.ERROR -> {
                 }
                 Status.LOADING -> {}
+            }
+        })
+
+        heroListViewModel.loadingMore.observe(viewLifecycleOwner, Observer{
+            when(it.status) {
+                Status.LOADING -> {
+                     if(it.data!!) {
+                         binding.loadingMore.visibility = View.VISIBLE
+                         val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
+                         layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
+                             , 0, 0,
+                             resources.getDimensionPixelSize(R.dimen.recyclerView_bottomMargin)
+                         )
+                     }else {
+                         binding.loadingMore.visibility = View.GONE
+                         val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
+                         layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
+                             , 0, 0,
+                             0
+                         )
+                     }
+
+                }
+                Status.ERROR -> {
+                    binding.loadingMore.visibility = View.GONE
+                    val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
+                    layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
+                        , 0, 0,
+                        0
+                    )
+                    Log.i("error", it.message!!)
+
+                    Toast.makeText(requireContext(), "There is a problem with the internet connection. Try again", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }

@@ -17,13 +17,28 @@ class MarverRepository(private val context: Context) {
     private val apiInterface = APIClient.getRetrofit(context)
 
     fun getAllHeroes(
-        offset: Int
+        limit: Int
     ): Flow<HeroesData?> = flow {
         val timestamp = Calendar.getInstance().time.toString()
 
         emit(
             apiInterface.getAllHeroes(
-                ORDER_BY_NAME, offset, timestamp,
+                ORDER_BY_NAME, limit, timestamp,
+                BuildConfig.PUBLIC_KEY,
+                getHash(timestamp)
+            ).data
+        )
+    }
+
+    fun getMoreHeroes(
+        limit: Int,
+        offset: Int
+    ): Flow<HeroesData?> = flow {
+        val timestamp = Calendar.getInstance().time.toString()
+
+        emit(
+            apiInterface.getMoreHeroes(
+                ORDER_BY_NAME, limit,offset, timestamp,
                 BuildConfig.PUBLIC_KEY,
                 getHash(timestamp)
             ).data
