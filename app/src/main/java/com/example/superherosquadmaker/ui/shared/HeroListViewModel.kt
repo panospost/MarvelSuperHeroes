@@ -124,11 +124,11 @@ class HeroListViewModel(
                 .catch { e ->
                     _loadingMore.postValue(Resource.error(e.message.toString(), null))
                 }
-                .onCompletion {
-                    _loadingMore.postValue(Resource.loading(false))
-                }
                 .collect {
-                    _loadingMore.postValue(Resource.loading(false))
+                    localRepository.getAllHeroes().flowOn(Dispatchers.Default).collect{
+                        _loadingMore.postValue(Resource.loading(false))
+                        _heroes.postValue(Resource.success(it))
+                    }
                 }
         }
     }

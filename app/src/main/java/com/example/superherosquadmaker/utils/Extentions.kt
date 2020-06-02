@@ -2,6 +2,7 @@ package com.example.superherosquadmaker.utils
 
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.superherosquadmaker.data.localdb.ComicLocal
