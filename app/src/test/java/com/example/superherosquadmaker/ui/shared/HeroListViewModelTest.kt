@@ -4,6 +4,7 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.example.superherosquadmaker.data.localdb.ComicLocal
 import com.example.superherosquadmaker.data.localdb.Hero
+import com.example.superherosquadmaker.data.model.heroesCollection.HeroesData
 import com.example.superherosquadmaker.utils.Resource
 import com.example.superherosquadmaker.utils.TestCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -155,22 +156,6 @@ class HeroListViewModelTest{
             viewModel.heroes.observeForever(herosObserver)
             verify(herosObserver).onChanged(Resource.loading(null))
             viewModel.heroes.removeObserver(herosObserver)
-        }
-    }
-
-    @Test
-    fun getMoreHeroes_Success() {
-        testCoroutineRule.runBlockingTest{
-            val hero =  Hero(1, "a", "hero","url", 1, 1)
-            doReturn(flowOf(listOf(hero)))
-                .`when`(marverRepository)
-                .getMoreHeroes(20, 0)
-
-            val viewModel = HeroListViewModel(marverRepository,repository)
-            viewModel.getMoreHeroes()
-            viewModel.loadingMore.observeForever(loadingMore)
-            verify(loadingMore).onChanged(Resource.loading(false))
-            viewModel.loadingMore.removeObserver(loadingMore)
         }
     }
 

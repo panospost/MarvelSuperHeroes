@@ -39,7 +39,7 @@ class HeroListViewModel(
         getMySquad()
     }
 
-    fun getMySquad() {
+    private fun getMySquad() {
         viewModelScope.launch {
             localRepository.getMySquad()
                 .flowOn(Dispatchers.IO)
