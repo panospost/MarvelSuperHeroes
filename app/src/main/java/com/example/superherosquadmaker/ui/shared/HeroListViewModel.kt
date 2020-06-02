@@ -147,7 +147,6 @@ class HeroListViewModel(
                             comicsData!!.results?.map { it.fromMarvelComicToLocalComic(characterId) }
                                 ?.toList()
                         }.flatMapConcat { comics ->
-                            Log.i("comics", comics?.size.toString())
                             localRepository.insertAllComics(comics!!).flatMapConcat {
                                 flow {
                                     emit(comics)
@@ -155,15 +154,15 @@ class HeroListViewModel(
                             }
                         }
                     } else {
-                        return@flatMapConcat flow {
-                            emit { storedComics }
+                        flow {
+                            emit(storedComics)
                         }
                     }
                 }.flowOn(Dispatchers.Default)
                 .catch { e ->
                     _comics.postValue(Resource.error(e.message.toString(), null))
                 }.collect {
-                    _comics.postValue(Resource.success(it) as Resource<List<ComicLocal>>?)
+                    _comics.postValue(Resource.success(it))
                 }
         }
     }

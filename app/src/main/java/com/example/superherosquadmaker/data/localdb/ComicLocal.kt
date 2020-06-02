@@ -4,7 +4,7 @@ import androidx.room.*
 
 @Entity(tableName = "comicsDb", foreignKeys = [ForeignKey(entity=Hero::class, parentColumns = arrayOf("id"), childColumns = arrayOf("characterId"),
     onDelete = ForeignKey.CASCADE, onUpdate = ForeignKey.CASCADE, deferred = true)], indices= arrayOf(
-    Index(value = arrayOf("characterId"), unique = true)
+    Index(value = arrayOf("characterId"))
 ) )
 data class ComicLocal(
     @PrimaryKey

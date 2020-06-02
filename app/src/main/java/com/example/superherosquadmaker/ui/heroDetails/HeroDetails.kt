@@ -96,6 +96,7 @@ class HeroDetails : Fragment() {
                         binding.relativeLayout.visibility = View.VISIBLE
                         binding.andMore.visibility = View.VISIBLE
                         binding.loading.visibility = View.GONE
+                        Log.i("we", it.data.toString())
                         setUpComicsSection(it.data)
                     } else {
                         binding.loading.visibility = View.GONE
@@ -132,7 +133,9 @@ class HeroDetails : Fragment() {
 
     private fun populateComics(comics: List<ComicLocal>) {
         binding.localComic1 = comics[0]
-        binding.localComic2 = comics[1]
+        if(comics.size > 1) {
+            binding.localComic2 = comics[1]
+        }
     }
 
     @ExperimentalCoroutinesApi
