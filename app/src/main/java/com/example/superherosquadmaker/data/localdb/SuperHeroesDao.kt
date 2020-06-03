@@ -21,9 +21,6 @@ interface Marveldao{
     @Query(value = "DELETE from superheroes")
     fun clear()
 
-////    @Query("SELECT * FROM superheroes_local_db")
-////    fun getAllRecipes(): DataSource.Factory<Int, Hero>
-//
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllComics(comics: List<ComicLocal>)
 

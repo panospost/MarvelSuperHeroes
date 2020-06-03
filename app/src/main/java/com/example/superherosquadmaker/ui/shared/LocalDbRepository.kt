@@ -33,10 +33,4 @@ class LocalDbRepository(private val db: HerosLocalDb) {
     fun getAllHeroes(): Flow<List<Hero>> = flow {
         emit(db.heroesDao.getAllHeroes())
     }
-
-    fun clear() = flow {
-        db.heroesDao.clear()
-        emit(Unit)
-    }
-
 }
