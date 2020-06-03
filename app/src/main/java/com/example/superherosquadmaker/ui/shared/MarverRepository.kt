@@ -3,6 +3,7 @@ package com.example.superherosquadmaker.ui.shared
 import android.content.Context
 import com.example.superherosquadmaker.BuildConfig
 import com.example.superherosquadmaker.data.api.APIClient
+import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.data.model.comicCollection.ComicsData
 import com.example.superherosquadmaker.data.model.heroesCollection.HeroesData
 import com.example.superherosquadmaker.utils.md5
@@ -62,10 +63,24 @@ class MarverRepository(private val context: Context) {
         )
     }
 
+    suspend fun getHeroByName(name: String)= flow {
+        val timestamp = Calendar.getInstance().time.toString()
+        emit(
+            apiInterface.getHeroByName(
+                name,
+                timestamp,
+                BuildConfig.PUBLIC_KEY,
+                getHash(timestamp)
+            ).data
+        )
+    }
+
 
     private fun getHash(timestamp: String): String {
         val hash =
             timestamp + BuildConfig.PRIVATE_KEY + BuildConfig.PUBLIC_KEY
         return hash.md5()
     }
+
+
 }

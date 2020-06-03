@@ -10,11 +10,8 @@ import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.utils.fromHeroToSuperHero
 import com.example.superherosquadmaker.utils.Resource
 import com.example.superherosquadmaker.utils.fromMarvelComicToLocalComic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 
 class HeroListViewModel(
     val marverRepository: MarverRepository,
@@ -110,22 +107,22 @@ class HeroListViewModel(
             marverRepository.getMoreHeroes(
                 REQUESTED_CHARACTERS,
                 offset
-            ).map{ heroesData ->
+            ).map { heroesData ->
                 offset += REQUESTED_CHARACTERS
                 heroesData?.results?.map { it.fromHeroToSuperHero() }?.toList()
 
-            }.flatMapConcat { newHeroes->
-               return@flatMapConcat  localRepository.insertAll(newHeroes!!).flatMapConcat {
-                        flow {
-                            emit(heroes)
-                        }
+            }.flatMapConcat { newHeroes ->
+                return@flatMapConcat localRepository.insertAll(newHeroes!!).flatMapConcat {
+                    flow {
+                        emit(heroes)
                     }
+                }
             }.flowOn(Dispatchers.Default)
                 .catch { e ->
                     _loadingMore.postValue(Resource.error(e.message.toString(), null))
                 }
                 .collect {
-                    localRepository.getAllHeroes().flowOn(Dispatchers.Default).collect{
+                    localRepository.getAllHeroes().flowOn(Dispatchers.Default).collect {
                         _loadingMore.postValue(Resource.loading(false))
                         _heroes.postValue(Resource.success(it))
                     }
@@ -166,5 +163,38 @@ class HeroListViewModel(
                 }
         }
     }
+
+    fun getHeroByName(name: String) {
+        viewModelScope.launch {
+            localRepository.getHeroByName(name)
+                .flatMapConcat { hero ->
+                    if (hero != null) {
+                        flow {
+                            emit { listOf(hero) } }
+                    } else {
+                        return@flatMapConcat marverRepository.getHeroByName(name).map {
+                            it.results?.map { it.fromHeroToSuperHero() }?.toList()
+                        }.flatMapConcat { onlineHeroes ->
+                            if (onlineHeroes != null) {
+                                localRepository.insertAll(onlineHeroes).flatMapConcat { _ ->
+                                    flow {
+                                         emit{onlineHeroes}
+                                    }
+                                }
+                            } else {
+                                flow { emit { null } }
+                            }
+                        }
+                    }
+                }.flowOn(Dispatchers.Default)
+                .catch { e ->
+
+                }.collect {
+                    _heroes.postValue(Resource.success(it.invoke()))
+
+                }
+        }
+    }
+
 }
 

@@ -1,10 +1,10 @@
 package com.example.superherosquadmaker.ui.list
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.superherosquadmaker.MainActivity
 import com.example.superherosquadmaker.R
 import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.data.localdb.HerosLocalDb
@@ -23,6 +24,7 @@ import com.example.superherosquadmaker.ui.shared.MarverRepository
 import com.example.superherosquadmaker.utils.Status
 import com.example.superherosquadmaker.utils.setDivider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -42,6 +44,7 @@ class HeroList : Fragment() {
             inflater, R.layout.fragment_hero_list,
             container, false
         )
+        setHasOptionsMenu(true);
 
         setUpViewModel()
         setUpUI()
@@ -50,6 +53,31 @@ class HeroList : Fragment() {
         return binding.root
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        menu.clear()
+        inflater.inflate(R.menu.menu_main, menu)
+        val searchView = SearchView((context as MainActivity).supportActionBar?.themedContext ?: context)
+        menu.findItem(R.id.action_search).apply {
+            actionView = searchView
+        }
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                heroListViewModel.getHeroByName(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String): Boolean {
+                if (TextUtils.isEmpty(newText) || newText.isEmpty()) {
+                    heroListViewModel.getHeroes()
+                }else if(newText.length > 3) {
+                    heroListViewModel.getHeroByName(newText)
+                }
+                return false
+            }
+        })
+    }
     private fun handleItemClick(hero: Hero?) {
         heroListViewModel.getComics(
             hero!!.id

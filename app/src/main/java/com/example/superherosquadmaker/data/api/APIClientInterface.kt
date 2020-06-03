@@ -36,4 +36,12 @@ interface APIInterface {
         @Query("apikey") apikey: String,
         @Query("hash") hash: String
     ): GetComicResponse
+
+    @GET("/v1/public/characters")
+    suspend fun getHeroByName(
+        @Query("name") name: String,
+        @Query("ts") timestamp: String,
+        @Query("apikey") apikey: String,
+        @Query("hash") hash: String
+    ): GetHeroesResponse
 }

@@ -18,6 +18,9 @@ interface Marveldao{
     @Query(value = "SELECT * FROM  superheroes ORDER BY name")
     fun getAllHeroes(): List<Hero>
 
+    @Query(value = "SELECT * FROM  superheroes WHERE name=:name")
+    fun getHeroByName(name: String): Hero
+
     @Query(value = "DELETE from superheroes")
     fun clear()
 
