@@ -2,7 +2,6 @@ package com.example.superherosquadmaker.data.api
 
 import com.example.superherosquadmaker.data.model.comicCollection.GetComicResponse
 import com.example.superherosquadmaker.data.model.heroesCollection.GetHeroesResponse
-import retrofit2.Response
 import retrofit2.http.*
 
 

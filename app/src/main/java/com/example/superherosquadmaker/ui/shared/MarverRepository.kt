@@ -72,7 +72,10 @@ class MarverRepository( private val apiInterface: APIInterface) {
         )
     }
 
-
+    /**
+     * needed by the marvel api for non web applications
+     * to has the public key with the private key and a timestamp
+     */
     private fun getHash(timestamp: String): String {
         val hash =
             timestamp + BuildConfig.PRIVATE_KEY + BuildConfig.PUBLIC_KEY

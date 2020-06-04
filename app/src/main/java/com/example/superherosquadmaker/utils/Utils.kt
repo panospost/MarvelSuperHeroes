@@ -2,8 +2,6 @@ package com.example.superherosquadmaker.utils
 
 import com.example.superherosquadmaker.data.model.Thumbnail
 
-
-
 fun completeBuildOfURL(thumbnail: Thumbnail, portrait: PortraitSizes): String {
     return getHttpsUrl(thumbnail.path + "/" + portrait.size + "." + thumbnail.extension)
 }

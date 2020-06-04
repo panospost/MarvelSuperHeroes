@@ -3,7 +3,10 @@ package com.example.superherosquadmaker.utils
 import android.graphics.*
 import com.squareup.picasso.Transformation
 
-
+/**
+ * A picasso transformation
+ * cropping the images to a circle
+ */
 class RoundCornersTransform : Transformation {
 
     override fun transform(source: Bitmap): Bitmap {
