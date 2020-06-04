@@ -1,7 +1,6 @@
 package com.example.superherosquadmaker.data.localdb
 
 import androidx.room.*
-//import androidx.paging.DataSource
 
 @Dao
 interface Marveldao{

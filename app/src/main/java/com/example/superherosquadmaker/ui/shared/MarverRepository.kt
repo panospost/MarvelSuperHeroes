@@ -1,9 +1,7 @@
 package com.example.superherosquadmaker.ui.shared
 
-import android.content.Context
 import com.example.superherosquadmaker.BuildConfig
-import com.example.superherosquadmaker.data.api.APIClient
-import com.example.superherosquadmaker.data.localdb.Hero
+import com.example.superherosquadmaker.data.api.APIInterface
 import com.example.superherosquadmaker.data.model.comicCollection.ComicsData
 import com.example.superherosquadmaker.data.model.heroesCollection.HeroesData
 import com.example.superherosquadmaker.utils.md5
@@ -11,11 +9,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.util.*
 
-class MarverRepository(private val context: Context) {
+class MarverRepository( private val apiInterface: APIInterface) {
     private val ORDER_BY_NAME = "name"
     private val ORDER_BY_TITLE = "title"
     private val FORMAT = "comic"
-    private val apiInterface = APIClient.getRetrofit(context)
 
     fun getAllHeroes(
         limit: Int

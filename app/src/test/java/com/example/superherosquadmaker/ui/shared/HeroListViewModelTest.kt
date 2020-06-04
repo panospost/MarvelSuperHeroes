@@ -4,7 +4,6 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.example.superherosquadmaker.data.localdb.ComicLocal
 import com.example.superherosquadmaker.data.localdb.Hero
-import com.example.superherosquadmaker.data.model.heroesCollection.HeroesData
 import com.example.superherosquadmaker.utils.Resource
 import com.example.superherosquadmaker.utils.TestCoroutineRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,7 +18,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.doReturn
 import org.mockito.Mockito.verify
 import org.mockito.junit.MockitoJUnitRunner
-import java.io.IOException
 
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
@@ -180,9 +178,9 @@ class HeroListViewModelTest{
     @Test
     fun getComics_success() {
         testCoroutineRule.runBlockingTest{
-            val hero =  ComicLocal(1, "a", "hero", 1)
+            val comic =  ComicLocal(1, "a", "hero", 1)
 
-            doReturn(flowOf(listOf(hero)))
+            doReturn(flowOf(listOf(comic)))
                 .`when`(repository)
                 .getComicsOfAHero(1)
 

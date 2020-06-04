@@ -3,12 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/HeroList">
+    app:startDestination="@id/HeroList"
+    tools:ignore="UnusedNavigation">
 
     <fragment
         android:id="@+id/HeroList"
         android:name="com.example.superherosquadmaker.ui.list.HeroList"
-        android:label="@string/first_fragment_label"
+        android:label="@string/hero_list_fragment_label"
         tools:layout="@layout/fragment_hero_list">
 
         <action
@@ -22,7 +23,7 @@
     <fragment
         android:id="@+id/HeroDetails"
         android:name="com.example.superherosquadmaker.ui.heroDetails.HeroDetails"
-        android:label="@string/second_fragment_label"
+        android:label="@string/hero_details_fragment_label"
         tools:layout="@layout/fragment_hero_details">
         <action
             android:id="@+id/action_HeroDetails_to_HeroList"

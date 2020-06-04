@@ -1,6 +1,5 @@
 package com.example.superherosquadmaker.ui.shared
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -63,6 +62,7 @@ class HeroListViewModel(
         }
     }
 
+    @ExperimentalCoroutinesApi
     fun getHeroes() {
         viewModelScope.launch {
             _heroes.postValue(Resource.loading(null))
@@ -164,21 +164,23 @@ class HeroListViewModel(
         }
     }
 
+    @ExperimentalCoroutinesApi
     fun getHeroByName(name: String) {
         viewModelScope.launch {
             localRepository.getHeroByName(name)
                 .flatMapConcat { hero ->
                     if (hero != null) {
                         flow {
-                            emit { listOf(hero) } }
+                            emit { listOf(hero) }
+                        }
                     } else {
-                        return@flatMapConcat marverRepository.getHeroByName(name).map {
+                        return@flatMapConcat marverRepository.getHeroByName(name).map { it ->
                             it.results?.map { it.fromHeroToSuperHero() }?.toList()
                         }.flatMapConcat { onlineHeroes ->
                             if (onlineHeroes != null) {
                                 localRepository.insertAll(onlineHeroes).flatMapConcat { _ ->
                                     flow {
-                                         emit{onlineHeroes}
+                                        emit { onlineHeroes }
                                     }
                                 }
                             } else {

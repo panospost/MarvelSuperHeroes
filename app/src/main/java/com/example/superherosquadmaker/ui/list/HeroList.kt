@@ -14,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.example.superherosquadmaker.MainActivity
 import com.example.superherosquadmaker.R
+import com.example.superherosquadmaker.data.api.APIClient
 import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.data.localdb.HerosLocalDb
 import com.example.superherosquadmaker.databinding.FragmentHeroListBinding
@@ -27,7 +28,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 /**
- * A simple [Fragment] subclass as the default destination in the navigation.
+ *A list of heroes that are being fetched from the marvel api.
+ * plus the my squad section with the heroes the user clicked.
+ * Also the ability to search a hero by name directly to the marvel api
+ * if the hero is not cached
  */
 class HeroList : Fragment() {
 
@@ -36,6 +40,7 @@ class HeroList : Fragment() {
     private lateinit var adapter: LinearHeroAdapter
     private lateinit var horizontalAdapter: HorizontalHeroListAdapter
 
+    @ExperimentalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -44,7 +49,7 @@ class HeroList : Fragment() {
             inflater, R.layout.fragment_hero_list,
             container, false
         )
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(true)
 
         setUpViewModel()
         setUpUI()
@@ -78,6 +83,8 @@ class HeroList : Fragment() {
             }
         })
     }
+
+    @ExperimentalCoroutinesApi
     private fun handleItemClick(hero: Hero?) {
         heroListViewModel.getComics(
             hero!!.id
@@ -92,9 +99,9 @@ class HeroList : Fragment() {
             requireActivity(),
             HeroListViewModelFactory(
                 MarverRepository(
-                    requireContext()
+                    APIClient.getRetrofit(requireContext())
                 ),
-                LocalDbRepository(HerosLocalDb.getInstance(requireContext()))
+                LocalDbRepository(HerosLocalDb.getInstance(requireContext()).heroesDao)
             )
         ).get(HeroListViewModel::class.java)
     }
@@ -114,7 +121,6 @@ class HeroList : Fragment() {
                         heroListViewModel.getMoreHeroes()
                     }
                 }
-
             })
         }
 
@@ -130,7 +136,6 @@ class HeroList : Fragment() {
                 Status.SUCCESS -> {
                     binding.loading.visibility = View.GONE
                     adapter.submitList(it.data?.toMutableList())
-                    Log.d("newdata", it.data?.size.toString())
                 }
                 Status.ERROR -> {
                     binding.loading.visibility = View.GONE
@@ -157,6 +162,11 @@ class HeroList : Fragment() {
 
                 }
                 Status.ERROR -> {
+                    binding.mySquad.visibility = View.GONE
+                    binding.mySquadTitle.visibility = View.GONE
+
+                    Toast.makeText(requireContext(), getString(R.string.squad_didnt_load), Toast.LENGTH_SHORT).show()
+
                 }
                 Status.LOADING -> {}
             }
@@ -167,34 +177,32 @@ class HeroList : Fragment() {
                 Status.LOADING -> {
                      if(it.data!!) {
                          binding.loadingMore.visibility = View.VISIBLE
-                         val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
-                         layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
-                             , 0, 0,
-                             resources.getDimensionPixelSize(R.dimen.recyclerView_bottomMargin)
-                         )
+                         changeRecyclerViewParams(resources.getDimensionPixelSize(R.dimen.recyclerView_bottomMargin))
                      }else {
                          binding.loadingMore.visibility = View.GONE
-                         val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
-                         layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
-                             , 0, 0,
-                             0
-                         )
+                         changeRecyclerViewParams(0)
                      }
 
                 }
                 Status.ERROR -> {
                     binding.loadingMore.visibility = View.GONE
-                    val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
-                    layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
-                        , 0, 0,
-                        0
-                    )
-                    Log.i("error", it.message!!)
+                    changeRecyclerViewParams(0)
 
-                    Toast.makeText(requireContext(), "There is a problem with the internet connection. Try again", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), getString(R.string.connection_problem), Toast.LENGTH_SHORT).show()
+                }
+                else ->{
+
                 }
             }
         })
+    }
+
+    private fun changeRecyclerViewParams(bottom: Int) {
+        val layoutParams = (binding.listView.layoutParams as? ViewGroup.MarginLayoutParams)
+        layoutParams?.setMargins(resources.getDimensionPixelSize(R.dimen.recyclerView_left)
+            , 0, 0,
+            bottom
+        )
     }
 
 }

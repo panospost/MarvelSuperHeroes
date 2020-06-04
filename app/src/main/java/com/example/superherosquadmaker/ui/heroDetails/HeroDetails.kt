@@ -1,7 +1,6 @@
 package com.example.superherosquadmaker.ui.heroDetails
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,17 +22,15 @@ import com.example.superherosquadmaker.ui.shared.HeroListViewModelFactory
 import com.example.superherosquadmaker.ui.shared.LocalDbRepository
 import com.example.superherosquadmaker.ui.shared.MarverRepository
 import com.example.superherosquadmaker.utils.*
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
-import com.squareup.picasso.Picasso
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 /**
- * A simple [Fragment] subclass as the second destination in the navigation.
+ * Displays the hero image
+ * the hero name, a small biography, and two comics that the hero was in
  */
 class HeroDetails : Fragment() {
-
+    private var MAX_COMICS_SEEN = 2
     private lateinit var heroListViewModel: HeroListViewModel
     private lateinit var binding: FragmentHeroDetailsBinding
     private lateinit var hero: Hero
@@ -59,9 +56,9 @@ class HeroDetails : Fragment() {
             requireActivity(),
             HeroListViewModelFactory(
                 MarverRepository(
-                   requireContext()
+                    APIClient.getRetrofit(requireContext())
                 ),
-                LocalDbRepository(HerosLocalDb.getInstance(requireContext()))
+                LocalDbRepository(HerosLocalDb.getInstance(requireContext()).heroesDao)
             )
         ).get(HeroListViewModel::class.java)
     }
@@ -96,7 +93,6 @@ class HeroDetails : Fragment() {
                         binding.relativeLayout.visibility = View.VISIBLE
                         binding.andMore.visibility = View.VISIBLE
                         binding.loading.visibility = View.GONE
-                        Log.i("we", it.data.toString())
                         setUpComicsSection(it.data)
                     } else {
                         binding.loading.visibility = View.GONE
@@ -120,9 +116,9 @@ class HeroDetails : Fragment() {
     }
 
     private fun setUpComicsSection(comics: List<ComicLocal>?) {
-        val totalComics = binding.hero!!.totalComics?.minus(2)
-        if (totalComics!! > 2) {
-            binding.andMore.text = "and ${binding.hero!!.totalComics?.minus(2)} other comic"
+        val totalComics = binding.hero!!.totalComics?.minus(MAX_COMICS_SEEN)
+        if (totalComics!! > MAX_COMICS_SEEN) {
+            binding.andMore.text = String.format(getString(R.string.other_comics, binding.hero!!.totalComics?.minus(MAX_COMICS_SEEN)))
         }
 
         if (comics != null && comics.isNotEmpty()) {
@@ -133,7 +129,7 @@ class HeroDetails : Fragment() {
 
     private fun populateComics(comics: List<ComicLocal>) {
         binding.localComic1 = comics[0]
-        if(comics.size > 1) {
+        if(comics.size > MAX_COMICS_SEEN - 1) {
             binding.localComic2 = comics[1]
         }
     }
