@@ -46,6 +46,11 @@ ext {
     moshi_version = "1.9.2"
     room_version = "2.2.5"
     picassoVersion = "2.71828"
+    mockitoCore = "3.3.3"
+    mockitoInline = "2.13.0"
+    coreTesting = "2.1.0"
+    coroutinesTest = "1.3.4"
+    espressoContrib = "3.3.0-rc01"
 }
 
 task clean(type: Delete) {

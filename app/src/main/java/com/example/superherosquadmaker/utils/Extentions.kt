@@ -2,7 +2,6 @@ package com.example.superherosquadmaker.utils
 
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.example.superherosquadmaker.data.localdb.ComicLocal
@@ -37,7 +36,8 @@ fun Comic.fromMarvelComicToLocalComic(heroId: Int) = ComicLocal(
     id = id,
     title = title,
     thumbnail = completeBuildOfURL(thumbnail, PortraitSizes.SQUARE_LARGE),
-    characterId = heroId
+    characterId = heroId,
+    issueNumber = issueNumber
 )
 // return a clone of the hero object but with the
 // different squad status

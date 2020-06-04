@@ -13,5 +13,7 @@ data class ComicLocal(
     @ColumnInfo(name = "thumbnail")
     val thumbnail: String,
     @ColumnInfo(name = "characterId")
-    val characterId: Int = 0
+    val characterId: Int = 0,
+    @ColumnInfo(name = "issueNumber ")
+    val issueNumber : Double?
 )

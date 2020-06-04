@@ -9,8 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.superherosquadmaker.*
 import com.example.superherosquadmaker.data.localdb.Hero
 import com.example.superherosquadmaker.databinding.HeroListViewBinding
-import com.example.superherosquadmaker.utils.RoundCornersTransform
-import com.squareup.picasso.Picasso
 
 class LinearHeroAdapter(private val onClickListener: ItemClickedListener): ListAdapter<Hero, LinearHeroAdapter.ViewHolder>(DiffUtilCallback()){
 

@@ -2,7 +2,6 @@ package com.example.superherosquadmaker.ui.list
 
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.*
 import android.widget.SearchView
 import android.widget.Toast

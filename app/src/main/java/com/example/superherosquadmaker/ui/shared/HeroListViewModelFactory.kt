@@ -2,7 +2,6 @@ package com.example.superherosquadmaker.ui.shared
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.superherosquadmaker.data.api.APIClient
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

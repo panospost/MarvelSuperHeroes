@@ -7,7 +7,7 @@ import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
 data class Comic(val creators: Creators,
-                 val issueNumber: Int = 0,
+                 val issueNumber: Double = 0.0,
                  val isbn: String = "",
                  val description: String? = "",
                  val title: String = "",

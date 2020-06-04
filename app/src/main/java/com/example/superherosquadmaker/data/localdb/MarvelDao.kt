@@ -26,7 +26,7 @@ interface Marveldao{
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllComics(comics: List<ComicLocal>)
 
-    @Query(value = "SELECT * FROM  comicsDb WHERE characterId=:heroId")
+    @Query(value = "SELECT * FROM  comicsDb WHERE characterId=:heroId Order by `issueNumber ` desc")
     fun getComicsOfSpecificHero(heroId: Int): List<ComicLocal>
 
 }
